@@ -3,7 +3,7 @@
 import React from 'react';
 import { useGameStore } from '../store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Printer, Check, X, Sparkles, AlertTriangle } from 'lucide-react';
+import { Printer, X, AlertTriangle } from 'lucide-react';
 
 export const ModalReceipt: React.FC = () => {
   const isReceiptModalOpen = useGameStore((state) => state.isReceiptModalOpen);
@@ -21,6 +21,19 @@ export const ModalReceipt: React.FC = () => {
   const isExpress = currentCustomer.service === 'express';
   const ratePerKg = isExpress ? 12000 : 7000;
   const totalPrice = weight * ratePerKg;
+
+  const getCustomerTypeLabel = () => {
+    switch (currentCustomer.type) {
+      case 'anak_kos':
+        return 'Anak Kos';
+      case 'ibu_ibu':
+        return 'Ibu Hamil / Ibu Rumah Tangga';
+      case 'pegawai_bumn':
+        return 'Pegawai BUMN / Kedinasan';
+      default:
+        return 'Pelanggan Umum';
+    }
+  };
 
   const handlePrintReceipt = () => {
     // Check soap stock warning
@@ -77,9 +90,7 @@ export const ModalReceipt: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Tipe Pelanggan:</span>
-                <span className="font-bold uppercase">
-                  {currentCustomer.type === 'anak_kos' ? 'Anak Kos' : 'Ibu-Ibu Rumah Tangga'}
-                </span>
+                <span className="font-bold uppercase">{getCustomerTypeLabel()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Pilihan Layanan:</span>

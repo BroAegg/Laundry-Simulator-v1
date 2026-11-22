@@ -16,13 +16,39 @@ export const Dialogue: React.FC<DialogueProps> = ({ customer }) => {
 
   const isExpress = customer.service === 'express';
 
+  const getTypeLabel = () => {
+    switch (customer.type) {
+      case 'anak_kos':
+        return '🎒 Anak Kos';
+      case 'ibu_ibu':
+        return '🤰 Ibu Hamil';
+      case 'pegawai_bumn':
+        return '👔 Pegawai BUMN';
+      default:
+        return 'Pelanggan';
+    }
+  };
+
+  const getTypeStyle = () => {
+    switch (customer.type) {
+      case 'anak_kos':
+        return 'bg-blue-100 text-blue-700 border-blue-300';
+      case 'ibu_ibu':
+        return 'bg-purple-100 text-purple-700 border-purple-300';
+      case 'pegawai_bumn':
+        return 'bg-amber-100 text-amber-800 border-amber-300';
+      default:
+        return 'bg-slate-100 text-slate-700 border-slate-300';
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.85, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.85, y: 10 }}
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-      className="absolute bottom-[44%] left-[26%] sm:left-[30%] -translate-x-1/2 z-35 max-w-[260px] sm:max-w-[320px] pointer-events-none select-none"
+      className="absolute bottom-[44%] left-[26%] sm:left-[30%] -translate-x-1/2 z-35 max-w-[260px] sm:max-w-[340px] pointer-events-none select-none"
     >
       <div className="relative bg-white/95 border-3 border-slate-800 rounded-2xl p-3 shadow-2xl text-slate-800 backdrop-blur-sm">
         {/* Header with Name & Service Badge */}
@@ -32,13 +58,9 @@ export const Dialogue: React.FC<DialogueProps> = ({ customer }) => {
               {customer.name}
             </span>
             <span
-              className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${
-                customer.type === 'anak_kos'
-                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                  : 'bg-purple-100 text-purple-700 border border-purple-300'
-              }`}
+              className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full border ${getTypeStyle()}`}
             >
-              {customer.type === 'anak_kos' ? '🎒 Anak Kos' : '🧺 Ibu-Ibu'}
+              {getTypeLabel()}
             </span>
           </div>
 

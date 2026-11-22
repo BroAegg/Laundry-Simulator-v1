@@ -1,4 +1,4 @@
-export type CustomerType = 'anak_kos' | 'ibu_ibu';
+export type CustomerType = 'anak_kos' | 'ibu_ibu' | 'pegawai_bumn';
 
 export type ServiceType = 'reguler' | 'express';
 
@@ -22,6 +22,7 @@ export interface Customer {
   dialogue: string;
   hasLaundryBag: boolean;
   avatarVariant: number;
+  spriteUrl?: string;
 }
 
 export interface DailyTransaction {

@@ -3,7 +3,7 @@
 import React from 'react';
 import { useGameStore } from '../store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, TrendingDown, DollarSign, Calendar, ArrowRight, History, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Calendar, ArrowRight, History } from 'lucide-react';
 
 export const ModalEOD: React.FC = () => {
   const isEODModalOpen = useGameStore((state) => state.isEODModalOpen);
@@ -20,6 +20,19 @@ export const ModalEOD: React.FC = () => {
   if (!isEODModalOpen) return null;
 
   const netProfit = todayIncome - todayExpense;
+
+  const getCustomerBadge = (type: string) => {
+    switch (type) {
+      case 'anak_kos':
+        return '🎒 Anak Kos';
+      case 'ibu_ibu':
+        return '🤰 Ibu Hamil';
+      case 'pegawai_bumn':
+        return '👔 Pegawai BUMN';
+      default:
+        return 'Pelanggan';
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -130,9 +143,7 @@ export const ModalEOD: React.FC = () => {
                     >
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-[10px] text-slate-500">{tx.time || tx.id}</span>
-                        <span className="font-bold text-slate-200">
-                          {tx.customerType === 'anak_kos' ? '🎒 Anak Kos' : '🧺 Ibu-Ibu'}
-                        </span>
+                        <span className="font-bold text-slate-200">{getCustomerBadge(tx.customerType)}</span>
                         <span
                           className={`text-[9px] uppercase px-1 rounded font-bold ${
                             tx.service === 'express'

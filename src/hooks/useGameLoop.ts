@@ -5,24 +5,33 @@ import { useGameStore } from '../store/gameStore';
 import { Customer, CustomerType, ServiceType } from '../types/game';
 
 const ANAK_KOS_NAMES = ['Rian', 'Dimas', 'Bagas', 'Bayu', 'Adit', 'Fajar', 'Rizky'];
-const IBU_IBU_NAMES = ['Bu Tejo', 'Bu Siti', 'Bu Ratna', 'Bu Wati', 'Bu Sri', 'Bu Nur', 'Bu Dewi'];
+const IBU_IBU_NAMES = ['Bu Siti (Hamil 7 Bulan)', 'Bu Ratna', 'Bu Wati', 'Bu Sri', 'Bu Nur', 'Bu Dewi'];
+const PEGAWAI_BUMN_NAMES = ['Pak Hendra (PLN)', 'Pak Satria (Pertamina)', 'Mas Danang (KAI)', 'Pak Fajar (Telkom)', 'Mas Budi (Mandiri)'];
 
 const DIALOGUES = {
   anak_kos: {
     masuk: 'Permisi mas, mau nitip laundry pakaian kuliah nih...',
-    menunggu: 'Tolong ditimbang ya mas, pilih layanan reguler aja biar hemat.',
+    menunggu: 'Tolong ditimbang ya mas, pilih layanan reguler aja biar hemat uang saku.',
     menungguExpress: 'Mas, tolong pilih yang express ya, besok ada presentasi sidang skripsi!',
     ditimbang: 'Oke, pas banget beratnya. Tolong buatin nota transaksinya ya!',
     bayar: 'Ini uangnya pas ya mas. Nanti kalau sudah selesai saya ambil.',
     selesai: 'Makasih banyak ya mas, sukses terus usahanya!',
   },
   ibu_ibu: {
-    masuk: 'Halo mas ganteng, ibu mau cuci sprei sama pakaian anak-anak nih!',
-    menunggu: 'Tolong ditimbang hati-hati ya, deterjennya yang wangi semerbak!',
-    menungguExpress: 'Mas, bisa kilat express gak ya? Besok sore mau ada arisan keluarga!',
-    ditimbang: 'Sip mantap, harganya cocok. Jangan lupa bikinin nota rinciannya ya.',
-    bayar: 'Ini uangnya ya mas, uang kembaliannya ambil aja buat uang saku.',
+    masuk: 'Halo mas, ibu mau cuci sprei dan persiapan baju bayi nih, rada berat bawaannya...',
+    menunggu: 'Tolong ditimbang ya mas, deterjennya pakai yang wangi dan lembut ya!',
+    menungguExpress: 'Bisa kilat express gak ya mas? Besok lusa mau acara syukuran keluarga!',
+    ditimbang: 'Sip mantap harganya cocok. Tolong cetak notanya ya mas.',
+    bayar: 'Ini uangnya pas ya mas, terima kasih banyak sudah dibantu.',
     selesai: 'Matur nuwun ya mas, besok-besok ibu balik langganan lagi ke sini!',
+  },
+  pegawai_bumn: {
+    masuk: 'Selamat pagi mas, mau antar kemeja dinas dan celana seragam kantor nih...',
+    menunggu: 'Tolong ditimbang ya mas, kemejanya disetrika licin dan wangi ya.',
+    menungguExpress: 'Tolong yang kilat Express ya mas, besok ada apel pagi dan audit direksi!',
+    ditimbang: 'Oke, total harganya sesuai. Tolong buatin nota resminya ya mas buat SPJ.',
+    bayar: 'Ini uangnya ya mas, terima kasih banyak kerjasamanya.',
+    selesai: 'Terima kasih mas, nanti seragam kantor saya rutin laundry di sini.',
   },
 };
 
@@ -38,15 +47,31 @@ export function useGameLoop() {
   const [nextCustomerIn, setNextCustomerIn] = useState<number>(15);
   const isTransitioningRef = useRef<boolean>(false);
 
-  // Generate a random customer
+  // Generate a random customer from all 3 assets
   const spawnCustomer = useCallback(() => {
-    const isAnakKos = Math.random() > 0.45;
-    const type: CustomerType = isAnakKos ? 'anak_kos' : 'ibu_ibu';
-    const names = isAnakKos ? ANAK_KOS_NAMES : IBU_IBU_NAMES;
-    const name = names[Math.floor(Math.random() * names.length)];
-    const service: ServiceType = Math.random() > 0.35 ? 'reguler' : 'express';
-    // Random weight between 2 and 9 kg (inclusive)
-    const targetWeight = Math.floor(Math.random() * 8) + 2;
+    const roll = Math.random();
+    let type: CustomerType;
+    let name: string;
+    let spriteUrl: string;
+
+    if (roll < 0.35) {
+      type = 'anak_kos';
+      name = ANAK_KOS_NAMES[Math.floor(Math.random() * ANAK_KOS_NAMES.length)];
+      spriteUrl = '/assets/characters/sprite-anak-kos-clean.png';
+    } else if (roll < 0.7) {
+      type = 'ibu_ibu';
+      name = IBU_IBU_NAMES[Math.floor(Math.random() * IBU_IBU_NAMES.length)];
+      spriteUrl = '/assets/characters/sprite-ibu-hamil-clean.png';
+    } else {
+      type = 'pegawai_bumn';
+      name = PEGAWAI_BUMN_NAMES[Math.floor(Math.random() * PEGAWAI_BUMN_NAMES.length)];
+      spriteUrl = '/assets/characters/sprite-pegawai-bumn-clean.png';
+    }
+
+    // Pegawai BUMN prefers express 60% of the time, others 35%
+    const expressChance = type === 'pegawai_bumn' ? 0.6 : 0.35;
+    const service: ServiceType = Math.random() < expressChance ? 'express' : 'reguler';
+    const targetWeight = Math.floor(Math.random() * 8) + 2; // 2 - 9 kg
     const dialogues = DIALOGUES[type];
     const initialDialogue = service === 'express' ? dialogues.menungguExpress : dialogues.menunggu;
 
@@ -61,12 +86,19 @@ export function useGameLoop() {
       dialogue: initialDialogue,
       hasLaundryBag: true,
       avatarVariant: Math.floor(Math.random() * 3),
+      spriteUrl,
     };
 
     setCurrentCustomer(newCustomer);
-    setNotification(`Pelanggan baru datang: ${name} (${type === 'anak_kos' ? 'Anak Kos' : 'Ibu-ibu'})`);
+    const typeLabel =
+      type === 'anak_kos'
+        ? '🎒 Anak Kos'
+        : type === 'ibu_ibu'
+        ? '🤰 Ibu Hamil'
+        : '👔 Pegawai BUMN';
+    setNotification(`Pelanggan baru datang: ${name} (${typeLabel})`);
 
-    // Animate walking from entrance to counter (2.5s)
+    // Animate walking from entrance to counter (2.4s)
     setTimeout(() => {
       updateCustomerStatus('MENUNGGU');
     }, 2400);
