@@ -44,11 +44,11 @@ export const Dialogue: React.FC<DialogueProps> = ({ customer }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.88, y: -8 }}
+      initial={{ opacity: 0, scale: 0.88, y: -6 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.88, y: -8 }}
+      exit={{ opacity: 0, scale: 0.88, y: -6 }}
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-      className="absolute top-[12%] sm:top-[14%] left-[48%] sm:left-[50%] -translate-x-1/2 z-40 max-w-[280px] sm:max-w-[340px] pointer-events-none select-none"
+      className="absolute top-[9%] sm:top-[11%] left-[55%] -translate-x-1/2 z-40 max-w-[280px] sm:max-w-[340px] pointer-events-none select-none"
     >
       <div className="relative bg-white/98 border-2 border-slate-800 rounded-2xl p-2.5 shadow-2xl text-slate-800 backdrop-blur-md">
         {/* Header with Name & Service Badge */}
