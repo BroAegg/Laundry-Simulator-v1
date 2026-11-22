@@ -48,7 +48,7 @@ export const Dialogue: React.FC<DialogueProps> = ({ customer }) => {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.85, y: 10 }}
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-      className="absolute bottom-[44%] left-[26%] sm:left-[30%] -translate-x-1/2 z-35 max-w-[260px] sm:max-w-[340px] pointer-events-none select-none"
+      className="absolute bottom-[50%] left-[40%] sm:left-[42%] -translate-x-1/2 z-35 max-w-[280px] sm:max-w-[340px] pointer-events-none select-none"
     >
       <div className="relative bg-white/95 border-3 border-slate-800 rounded-2xl p-3 shadow-2xl text-slate-800 backdrop-blur-sm">
         {/* Header with Name & Service Badge */}
@@ -86,7 +86,7 @@ export const Dialogue: React.FC<DialogueProps> = ({ customer }) => {
           {customer.status === 'MENUNGGU' && (
             <span className="text-blue-600 font-bold flex items-center gap-1">
               <Scale className="w-3 h-3 text-blue-500 animate-bounce" />
-              👉 Klik Timbangan untuk menimbang!
+              👉 Klik Timbangan di meja untuk menimbang!
             </span>
           )}
           {customer.status === 'DITIMBANG' && (
@@ -96,7 +96,7 @@ export const Dialogue: React.FC<DialogueProps> = ({ customer }) => {
           )}
           {customer.status === 'BAYAR' && (
             <span className="text-emerald-600 font-bold">
-              👉 Klik Laci Uang untuk terima pembayaran!
+              👉 Klik Meja Kasir untuk terima pembayaran!
             </span>
           )}
           {customer.status === 'KELUAR' && (
