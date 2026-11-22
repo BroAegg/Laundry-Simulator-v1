@@ -22,7 +22,8 @@ export interface Customer {
   dialogue: string;
   hasLaundryBag: boolean;
   avatarVariant: number;
-  spriteUrl?: string;
+  spriteBawaUrl: string;
+  spriteIdleUrl: string;
 }
 
 export interface DailyTransaction {

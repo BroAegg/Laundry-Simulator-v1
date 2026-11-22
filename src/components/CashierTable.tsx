@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Coins, ShoppingBag } from 'lucide-react';
+import { Plus, Coins } from 'lucide-react';
 
 export const CashierTable: React.FC = () => {
   const currentCustomer = useGameStore((state) => state.currentCustomer);
@@ -24,7 +24,7 @@ export const CashierTable: React.FC = () => {
   const [scaleSpinning, setScaleSpinning] = useState(false);
   const [shelfHovered, setShelfHovered] = useState(false);
 
-  // Handle clicking the digital scale in the image
+  // Handle clicking the digital scale
   const handleScaleClick = () => {
     if (!currentCustomer) {
       setNotification('Timbangan kosong. Tunggu pelanggan datang membawa cucian!');
@@ -40,10 +40,10 @@ export const CashierTable: React.FC = () => {
     setTimeout(() => {
       timbangPakaian();
       setScaleSpinning(false);
-    }, 600);
+    }, 500);
   };
 
-  // Handle clicking the logbook / buku nota in the image
+  // Handle clicking the logbook
   const handleLogbookClick = () => {
     if (!currentCustomer) {
       setNotification('Belum ada transaksi pelanggan saat ini.');
@@ -58,7 +58,7 @@ export const CashierTable: React.FC = () => {
     setReceiptModalOpen(true);
   };
 
-  // Handle receiving payment at the counter / drawer
+  // Handle receiving payment
   const handleDrawerPayment = () => {
     if (!currentCustomer) {
       setDrawerOpen(!isDrawerOpen);
@@ -68,13 +68,11 @@ export const CashierTable: React.FC = () => {
     if (currentCustomer.status === 'BAYAR') {
       setDrawerOpen(true);
 
-      // Deduct 1 soap stock
       const soapOk = kurangiStokSabun(1);
       if (!soapOk) {
         setNotification('⚠️ Sabun habis! Segera beli sabun baru di rak.');
       }
 
-      // Add transaction
       tambahTransaksi({
         customerType: currentCustomer.type,
         service: currentCustomer.service,
@@ -82,13 +80,11 @@ export const CashierTable: React.FC = () => {
         price: currentCustomer.price,
       });
 
-      // Customer leaves
       updateCustomerStatus('KELUAR');
 
-      // Auto close drawer after 1.8s
       setTimeout(() => {
         setDrawerOpen(false);
-      }, 1800);
+      }, 1600);
     } else {
       setDrawerOpen(!isDrawerOpen);
     }
@@ -102,12 +98,11 @@ export const CashierTable: React.FC = () => {
     <div className="absolute inset-0 pointer-events-none select-none z-30">
       {/* ========================================================
           HOTSPOT 1: RAK SABUN (Sisi Kiri Gambar x: 0%..43%, y: 6%..94%)
-          Menggunakan rak sabun yang sudah tertera di gambar asli
       ======================================================== */}
       <div
         onMouseEnter={() => setShelfHovered(true)}
         onMouseLeave={() => setShelfHovered(false)}
-        className="absolute left-[1%] top-[8%] w-[42%] h-[84%] pointer-events-auto cursor-pointer rounded-2xl transition-all duration-300 hover:ring-2 hover:ring-yellow-400/40 hover:bg-yellow-400/5 group flex flex-col justify-between p-3"
+        className="absolute left-[1%] top-[8%] w-[42%] h-[84%] pointer-events-auto cursor-pointer rounded-2xl transition-all duration-300 hover:bg-yellow-400/5 group p-3"
         title="Rak Sabun & Deterjen Laundry (Klik untuk beli stok)"
       >
         {/* Floating Shelf Status & Restock Tooltip */}
@@ -116,7 +111,7 @@ export const CashierTable: React.FC = () => {
             shelfHovered || soapStock <= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
           }`}
         >
-          <div className="bg-slate-950/90 border-2 border-yellow-400 text-yellow-300 px-3 py-1.5 rounded-xl shadow-2xl backdrop-blur-sm inline-flex items-center gap-2">
+          <div className="bg-slate-950/95 border-2 border-yellow-400 text-yellow-300 px-3 py-1.5 rounded-xl shadow-2xl backdrop-blur-sm inline-flex items-center gap-2">
             <span className="text-xs font-black tracking-wider uppercase">🧴 RAK SABUN</span>
             <span className="bg-yellow-400 text-slate-950 font-black text-xs px-2 py-0.5 rounded-full font-mono">
               {soapStock}/20
@@ -136,7 +131,7 @@ export const CashierTable: React.FC = () => {
 
         {/* Low soap alert banner if running out */}
         {soapStock <= 2 && (
-          <div className="bg-rose-950/90 border-2 border-rose-500 text-rose-200 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl animate-bounce self-start backdrop-blur-sm">
+          <div className="mt-2 bg-rose-950/90 border-2 border-rose-500 text-rose-200 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl animate-bounce self-start backdrop-blur-sm">
             ⚠️ Stok Sabun Menipis ({soapStock} tersisa)! Klik untuk restock.
           </div>
         )}
@@ -144,53 +139,53 @@ export const CashierTable: React.FC = () => {
 
       {/* ========================================================
           HOTSPOT 2: TIMBANGAN DIGITAL (Di Atas Meja Kasir)
-          Koordinat gambar asli: left 54%..68%, top 42%..65%
+          Koordinat gambar asli: left 55%..68%, top 44%..64%
       ======================================================== */}
-      {/* 2A. Laundry Bag on scale tray when customer is present */}
-      {currentCustomer && currentCustomer.status !== 'KELUAR' && (
+      {/* 2A. Natural Laundry Basket on scale tray when measured */}
+      {currentCustomer && currentCustomer.status !== 'KELUAR' && currentCustomer.status !== 'MASUK' && (
         <motion.div
-          initial={{ scale: 0, y: -20 }}
-          animate={{ scale: 1, y: 0 }}
-          className="absolute left-[58%] top-[34%] -translate-x-1/2 z-32 pointer-events-none flex flex-col items-center"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="absolute left-[58.5%] top-[40%] -translate-x-1/2 z-28 pointer-events-none flex flex-col items-center"
         >
-          <div className="relative w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-br from-indigo-600 via-blue-500 to-purple-600 rounded-3xl border-3 border-slate-900 shadow-2xl flex items-center justify-center text-white">
-            <ShoppingBag className="w-8 sm:w-10 h-8 sm:h-10 opacity-90 drop-shadow" />
-            <span className="absolute -bottom-2 bg-yellow-400 text-slate-950 font-mono font-black text-[10px] px-2 py-0.5 rounded-full shadow border border-slate-900">
-              {currentCustomer.measuredWeight ? `${currentCustomer.measuredWeight} kg` : 'Cucian'}
+          {/* Subtle laundry bundle sitting on the tray */}
+          <div className="w-14 sm:w-16 h-8 bg-gradient-to-t from-sky-600 to-indigo-400 rounded-t-full border-2 border-slate-900 shadow-md flex items-center justify-center">
+            <span className="text-[9px] font-black text-white font-mono drop-shadow">
+              {currentCustomer.measuredWeight ? `${currentCustomer.measuredWeight}kg` : 'Cucian'}
             </span>
           </div>
         </motion.div>
       )}
 
-      {/* 2B. Clickable Scale Area with Glow */}
+      {/* 2B. Clickable Scale Area */}
       <div
         onClick={handleScaleClick}
-        className={`absolute left-[54%] top-[43%] w-[14%] h-[20%] pointer-events-auto cursor-pointer rounded-2xl transition-all duration-300 flex flex-col items-center justify-between ${
+        className={`absolute left-[54.5%] top-[43%] w-[13.5%] h-[21%] pointer-events-auto cursor-pointer rounded-2xl transition-all duration-300 flex flex-col items-center justify-start pt-1 ${
           isScaleClickable
-            ? 'ring-4 ring-emerald-400/80 bg-emerald-400/10 shadow-[0_0_24px_rgba(52,211,153,0.5)] animate-pulse'
-            : 'hover:bg-blue-400/10'
+            ? 'ring-2 ring-emerald-400/90 bg-emerald-400/10 shadow-[0_0_20px_rgba(52,211,153,0.5)]'
+            : 'hover:bg-blue-400/5'
         }`}
         title="Timbangan Digital (Klik untuk menimbang cucian)"
       >
-        {/* Click Hint above scale */}
+        {/* Floating Hint above scale */}
         <AnimatePresence>
           {isScaleClickable && (
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 6 }}
-              className="absolute -top-8 bg-emerald-500 text-slate-950 font-black text-xs px-2.5 py-1 rounded-full shadow-2xl border-2 border-emerald-200 animate-bounce whitespace-nowrap"
+              className="-mt-7 bg-emerald-500 text-slate-950 font-black text-[11px] px-2.5 py-0.5 rounded-full shadow-2xl border-2 border-emerald-200 animate-bounce whitespace-nowrap"
             >
-              👉 KLIK TIMBANG
+              ⚖️ KLIK TIMBANG
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* 2C. Precision Digital LED Readout directly over the scale's screen */}
+      {/* 2C. Precision Digital LED Readout over scale screen */}
       <div
         onClick={handleScaleClick}
-        className="absolute left-[56.5%] top-[55.5%] w-[8.2%] h-[4.2%] pointer-events-auto cursor-pointer bg-slate-950/95 border-2 border-slate-800 rounded px-1.5 flex items-center justify-center shadow-inner z-32"
+        className="absolute left-[56.5%] top-[55.5%] w-[8.2%] h-[4.2%] pointer-events-auto cursor-pointer bg-slate-950 border border-slate-700 rounded px-1 flex items-center justify-center shadow-inner z-32"
       >
         <div className="font-mono font-black text-emerald-400 text-xs sm:text-sm tracking-widest drop-shadow-[0_0_6px_rgba(52,211,153,0.9)]">
           {scaleSpinning || isWeighing ? (
@@ -209,23 +204,23 @@ export const CashierTable: React.FC = () => {
       ======================================================== */}
       <div
         onClick={handleLogbookClick}
-        className={`absolute left-[70.5%] top-[51%] w-[11.5%] h-[14%] pointer-events-auto cursor-pointer rounded-2xl transition-all duration-300 flex flex-col items-center justify-center ${
+        className={`absolute left-[70.5%] top-[52%] w-[11.5%] h-[13%] pointer-events-auto cursor-pointer rounded-2xl transition-all duration-300 flex flex-col items-center justify-start pt-1 ${
           isNotaClickable
-            ? 'ring-4 ring-amber-400/90 bg-amber-400/15 shadow-[0_0_24px_rgba(251,191,36,0.6)] animate-pulse'
-            : 'hover:bg-amber-400/10'
+            ? 'ring-2 ring-amber-400/90 bg-amber-400/15 shadow-[0_0_20px_rgba(251,191,36,0.6)]'
+            : 'hover:bg-amber-400/5'
         }`}
         title="Buku Catatan Nota Transaksi (Klik untuk cetak struk)"
       >
-        {/* Click Hint above notebook */}
+        {/* Floating Hint above notebook */}
         <AnimatePresence>
           {isNotaClickable && (
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 6 }}
-              className="absolute -top-7 bg-amber-400 text-slate-950 font-black text-xs px-2.5 py-1 rounded-full shadow-2xl border-2 border-yellow-200 animate-bounce whitespace-nowrap"
+              className="-mt-7 bg-amber-400 text-slate-950 font-black text-[11px] px-2.5 py-0.5 rounded-full shadow-2xl border-2 border-yellow-200 animate-bounce whitespace-nowrap"
             >
-              👉 BUAT NOTA
+              📝 BUAT NOTA
             </motion.div>
           )}
         </AnimatePresence>
@@ -239,7 +234,7 @@ export const CashierTable: React.FC = () => {
         onClick={handleDrawerPayment}
         className={`absolute left-[52%] top-[66%] w-[36%] h-[24%] pointer-events-auto cursor-pointer rounded-2xl transition-all duration-300 flex flex-col items-center justify-center ${
           isPaymentClickable
-            ? 'ring-4 ring-emerald-400/90 bg-emerald-500/15 shadow-[0_0_30px_rgba(16,185,129,0.6)]'
+            ? 'ring-2 ring-emerald-400/90 bg-emerald-500/10 shadow-[0_0_24px_rgba(16,185,129,0.5)]'
             : 'hover:bg-slate-400/5'
         }`}
         title="Meja Kasir & Laci Kas (Klik untuk simpan pembayaran)"
@@ -251,9 +246,9 @@ export const CashierTable: React.FC = () => {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white font-black text-xs sm:text-sm px-4 py-2.5 rounded-2xl shadow-2xl border-2 border-emerald-300 flex items-center gap-2 animate-bounce"
+              className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-2xl shadow-2xl border-2 border-emerald-300 flex items-center gap-2 animate-bounce"
             >
-              <Coins className="w-5 h-5 text-yellow-300 animate-spin" />
+              <Coins className="w-4 h-4 text-yellow-300" />
               <span>TERIMA UANG (KLIK KASIR)</span>
             </motion.div>
           )}

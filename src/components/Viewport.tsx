@@ -23,19 +23,14 @@ export const Viewport: React.FC = () => {
   const isSunset = hours >= 16 && hours < 18;
   const isNight = hours >= 18;
 
-  // Resolve customer sprite URL
+  // Resolve customer sprite: switches to idle (tanpa cucian) once laundry is weighed!
   const getCustomerSprite = () => {
     if (!currentCustomer) return null;
-    if (currentCustomer.spriteUrl) return currentCustomer.spriteUrl;
-    switch (currentCustomer.type) {
-      case 'anak_kos':
-        return '/assets/characters/sprite-anak-kos-clean.png';
-      case 'ibu_ibu':
-        return '/assets/characters/sprite-ibu-hamil-clean.png';
-      case 'pegawai_bumn':
-        return '/assets/characters/sprite-pegawai-bumn-clean.png';
-      default:
-        return '/assets/characters/sprite-anak-kos-clean.png';
+    const isCarrying = currentCustomer.status === 'MASUK' || currentCustomer.status === 'MENUNGGU';
+    if (isCarrying) {
+      return currentCustomer.spriteBawaUrl || '/assets/characters/anak-kos-bawa.png';
+    } else {
+      return currentCustomer.spriteIdleUrl || '/assets/characters/anak-kos-idle.png';
     }
   };
 
@@ -51,11 +46,9 @@ export const Viewport: React.FC = () => {
         {/* ==================================================================
             LAYER z-0 & z-20: TOKO LAUNDRY BACKGROUND ASSETS
             Menggunakan artwork asli Toko Buka.jpg & Toko Tutup.jpg
-            Yang sudah memuat Rak Sabun lengkap di kiri, Meja Kasir di kanan,
-            Timbangan Digital, dan Buku Nota di atas meja!
         ================================================================== */}
         <div className="absolute inset-0 z-0 overflow-hidden">
-          {/* Toko Buka (Rolling Door Terbuka ke Jalan) */}
+          {/* Toko Buka (Pintu rolling door terbuka) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/props/Toko Buka.jpg"
@@ -63,14 +56,14 @@ export const Viewport: React.FC = () => {
             className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
           />
 
-          {/* Toko Tutup (Rolling Door Besi Tertutup) dengan animasi transisi */}
+          {/* Toko Tutup (Pintu rolling door besi tertutup) */}
           <motion.div
             initial={false}
             animate={{
               opacity: isOpen ? 0 : 1,
               pointerEvents: isOpen ? 'none' : 'auto',
             }}
-            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
             className="absolute inset-0 w-full h-full"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -94,50 +87,50 @@ export const Viewport: React.FC = () => {
         </div>
 
         {/* ==================================================================
-            LAYER z-10: SPRITE PELANGGAN (Anak Kos / Ibu Hamil / Pegawai BUMN)
-            Berjalan menuju depan meja kasir (koordinat x: ~38%)
+            LAYER z-10: SPRITE PELANGGAN (BERDIRI TEPAT DI DEPAN MEJA KASIR)
+            Koordinat x: 45%..55%, kaki menyentuh lantai (bottom: 0)
         ================================================================== */}
         <div className="absolute inset-0 z-10 pointer-events-none">
           <AnimatePresence>
             {currentCustomer && (
               <motion.div
                 key={currentCustomer.id}
-                initial={{ x: '-120%', opacity: 0 }}
+                initial={{ x: '-160%', opacity: 0 }}
                 animate={{
-                  x: currentCustomer.status === 'KELUAR' ? '-120%' : '140%',
+                  x: currentCustomer.status === 'KELUAR' ? '-160%' : '0%',
                   opacity: 1,
                 }}
-                exit={{ x: '-120%', opacity: 0 }}
+                exit={{ x: '-160%', opacity: 0 }}
                 transition={{
-                  duration: currentCustomer.status === 'KELUAR' ? 2.0 : 2.2,
+                  duration: currentCustomer.status === 'KELUAR' ? 1.8 : 2.0,
                   ease: 'easeInOut',
                 }}
-                className="absolute bottom-[2%] left-0 w-[180px] sm:w-[230px] md:w-[270px] h-[340px] sm:h-[400px] md:h-[460px] flex flex-col items-center justify-end z-10"
+                className="absolute bottom-0 left-[44%] sm:left-[46%] -translate-x-1/2 h-[60%] sm:h-[68%] md:h-[72%] w-auto flex flex-col items-center justify-end z-10"
               >
-                {/* Character Sprite with Walk / Idle Bob */}
+                {/* Character Sprite with Bob Animation */}
                 <motion.div
                   animate={{
                     y:
                       currentCustomer.status === 'MASUK' || currentCustomer.status === 'KELUAR'
-                        ? [0, -10, 0]
-                        : [0, -3, 0],
+                        ? [0, -8, 0]
+                        : [0, -2, 0],
                   }}
                   transition={{
                     duration:
                       currentCustomer.status === 'MASUK' || currentCustomer.status === 'KELUAR'
-                        ? 0.38
+                        ? 0.35
                         : 2.2,
                     repeat: Infinity,
                     ease: 'easeInOut',
                   }}
                   className="relative flex flex-col items-center select-none h-full justify-end"
                 >
-                  {/* High-Res Transparent Character Artwork */}
+                  {/* Clean Single Character Sprite (Bawa Cucian / Tanpa Cucian) */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={getCustomerSprite() || '/assets/characters/sprite-anak-kos-clean.png'}
+                    src={getCustomerSprite() || '/assets/characters/anak-kos-bawa.png'}
                     alt={currentCustomer.name}
-                    className="h-full w-auto max-h-[95%] object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.65)]"
+                    className="h-full w-auto object-contain drop-shadow-[0_10px_16px_rgba(0,0,0,0.6)]"
                   />
                 </motion.div>
               </motion.div>

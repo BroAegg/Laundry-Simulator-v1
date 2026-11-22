@@ -5,7 +5,7 @@ import { useGameStore } from '../store/gameStore';
 import { Customer, CustomerType, ServiceType } from '../types/game';
 
 const ANAK_KOS_NAMES = ['Rian', 'Dimas', 'Bagas', 'Bayu', 'Adit', 'Fajar', 'Rizky'];
-const IBU_IBU_NAMES = ['Bu Siti (Hamil 7 Bulan)', 'Bu Ratna', 'Bu Wati', 'Bu Sri', 'Bu Nur', 'Bu Dewi'];
+const IBU_IBU_NAMES = ['Bu Siti (Hamil)', 'Bu Ratna', 'Bu Wati', 'Bu Sri', 'Bu Nur', 'Bu Dewi'];
 const PEGAWAI_BUMN_NAMES = ['Pak Hendra (PLN)', 'Pak Satria (Pertamina)', 'Mas Danang (KAI)', 'Pak Fajar (Telkom)', 'Mas Budi (Mandiri)'];
 
 const DIALOGUES = {
@@ -47,28 +47,31 @@ export function useGameLoop() {
   const [nextCustomerIn, setNextCustomerIn] = useState<number>(15);
   const isTransitioningRef = useRef<boolean>(false);
 
-  // Generate a random customer from all 3 assets
+  // Generate a random customer with specific bawa & idle sprites
   const spawnCustomer = useCallback(() => {
     const roll = Math.random();
     let type: CustomerType;
     let name: string;
-    let spriteUrl: string;
+    let spriteBawaUrl: string;
+    let spriteIdleUrl: string;
 
     if (roll < 0.35) {
       type = 'anak_kos';
       name = ANAK_KOS_NAMES[Math.floor(Math.random() * ANAK_KOS_NAMES.length)];
-      spriteUrl = '/assets/characters/sprite-anak-kos-clean.png';
+      spriteBawaUrl = '/assets/characters/anak-kos-bawa.png';
+      spriteIdleUrl = '/assets/characters/anak-kos-idle.png';
     } else if (roll < 0.7) {
       type = 'ibu_ibu';
       name = IBU_IBU_NAMES[Math.floor(Math.random() * IBU_IBU_NAMES.length)];
-      spriteUrl = '/assets/characters/sprite-ibu-hamil-clean.png';
+      spriteBawaUrl = '/assets/characters/ibu-hamil-bawa.png';
+      spriteIdleUrl = '/assets/characters/ibu-hamil-idle.png';
     } else {
       type = 'pegawai_bumn';
       name = PEGAWAI_BUMN_NAMES[Math.floor(Math.random() * PEGAWAI_BUMN_NAMES.length)];
-      spriteUrl = '/assets/characters/sprite-pegawai-bumn-clean.png';
+      spriteBawaUrl = '/assets/characters/pegawai-bumn-bawa.png';
+      spriteIdleUrl = '/assets/characters/pegawai-bumn-idle.png';
     }
 
-    // Pegawai BUMN prefers express 60% of the time, others 35%
     const expressChance = type === 'pegawai_bumn' ? 0.6 : 0.35;
     const service: ServiceType = Math.random() < expressChance ? 'express' : 'reguler';
     const targetWeight = Math.floor(Math.random() * 8) + 2; // 2 - 9 kg
@@ -86,7 +89,8 @@ export function useGameLoop() {
       dialogue: initialDialogue,
       hasLaundryBag: true,
       avatarVariant: Math.floor(Math.random() * 3),
-      spriteUrl,
+      spriteBawaUrl,
+      spriteIdleUrl,
     };
 
     setCurrentCustomer(newCustomer);
@@ -98,10 +102,10 @@ export function useGameLoop() {
         : '👔 Pegawai BUMN';
     setNotification(`Pelanggan baru datang: ${name} (${typeLabel})`);
 
-    // Animate walking from entrance to counter (2.4s)
+    // Animate walking to front of counter (2.2s)
     setTimeout(() => {
       updateCustomerStatus('MENUNGGU');
-    }, 2400);
+    }, 2200);
   }, [setCurrentCustomer, updateCustomerStatus, setNotification]);
 
   // Game Clock Loop: Advances time when shop is open (08:00 - 18:00)
@@ -169,7 +173,7 @@ export function useGameLoop() {
         setCurrentCustomer(null);
         isTransitioningRef.current = false;
         setNextCustomerIn(Math.floor(Math.random() * 5) + 15);
-      }, 2500);
+      }, 2300);
 
       return () => clearTimeout(timeout);
     }
