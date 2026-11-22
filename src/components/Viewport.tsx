@@ -87,32 +87,32 @@ export const Viewport: React.FC = () => {
         </div>
 
         {/* ==================================================================
-            LAYER z-10: SPRITE PELANGGAN (BERDIRI TEPAT DI DEPAN MEJA KASIR)
-            Koordinat x: 45%..55%, kaki menyentuh lantai (bottom: 0)
+            LAYER z-25: SPRITE PELANGGAN (BERDIRI TEPAT DI DEPAN MEJA KASIR)
+            Kaki menyentuh lantai (bottom: 0), posisi x: 50%..52% di depan meja
         ================================================================== */}
-        <div className="absolute inset-0 z-10 pointer-events-none">
+        <div className="absolute inset-0 z-25 pointer-events-none">
           <AnimatePresence>
             {currentCustomer && (
               <motion.div
                 key={currentCustomer.id}
-                initial={{ x: '-160%', opacity: 0 }}
+                initial={{ x: '-180%', opacity: 0 }}
                 animate={{
-                  x: currentCustomer.status === 'KELUAR' ? '-160%' : '0%',
+                  x: currentCustomer.status === 'KELUAR' ? '-180%' : '0%',
                   opacity: 1,
                 }}
-                exit={{ x: '-160%', opacity: 0 }}
+                exit={{ x: '-180%', opacity: 0 }}
                 transition={{
                   duration: currentCustomer.status === 'KELUAR' ? 1.8 : 2.0,
                   ease: 'easeInOut',
                 }}
-                className="absolute bottom-0 left-[44%] sm:left-[46%] -translate-x-1/2 h-[60%] sm:h-[68%] md:h-[72%] w-auto flex flex-col items-center justify-end z-10"
+                className="absolute bottom-0 left-[50%] sm:left-[52%] -translate-x-1/2 h-[58%] sm:h-[65%] md:h-[70%] w-auto flex flex-col items-center justify-end"
               >
-                {/* Character Sprite with Bob Animation */}
+                {/* Character Sprite with Walk / Idle Bob */}
                 <motion.div
                   animate={{
                     y:
                       currentCustomer.status === 'MASUK' || currentCustomer.status === 'KELUAR'
-                        ? [0, -8, 0]
+                        ? [0, -7, 0]
                         : [0, -2, 0],
                   }}
                   transition={{
@@ -130,14 +130,14 @@ export const Viewport: React.FC = () => {
                   <img
                     src={getCustomerSprite() || '/assets/characters/anak-kos-bawa.png'}
                     alt={currentCustomer.name}
-                    className="h-full w-auto object-contain drop-shadow-[0_10px_16px_rgba(0,0,0,0.6)]"
+                    className="h-full w-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.7)]"
                   />
                 </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Dialogue Balon Percakapan Pelanggan */}
+          {/* Dialogue Balon Percakapan Pelanggan (Floating rapi di atas kepala) */}
           <Dialogue customer={currentCustomer} />
         </div>
 
